@@ -25,25 +25,36 @@ export const AuthProvider = ({ children }) => {
     const storedToken = localStorage.getItem('token');
     const storedUser = localStorage.getItem('user');
     if (storedToken) {
+      const payload = decodeJwt(storedToken);
+      const nowSec = Math.floor(Date.now() / 1000);
+
+      // If token invalid or expired, clear it
+      if (!payload || (payload.exp && payload.exp < nowSec)) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setToken(null);
+        setUser(null);
+        setIsAuthenticated(false);
+        return;
+      }
+
       setToken(storedToken);
       setIsAuthenticated(true);
+
       if (storedUser) {
         try {
           setUser(JSON.parse(storedUser));
         } catch (e) {
           console.warn('Failed to parse stored user');
         }
-      } else {
-        const payload = decodeJwt(storedToken);
-        if (payload?.role) {
-          const fallbackUser = {
-            id: payload.id,
-            employeeId: payload.employeeId,
-            role: payload.role,
-          };
-          setUser(fallbackUser);
-          localStorage.setItem('user', JSON.stringify(fallbackUser));
-        }
+      } else if (payload?.role) {
+        const fallbackUser = {
+          id: payload.id,
+          employeeId: payload.employeeId,
+          role: payload.role,
+        };
+        setUser(fallbackUser);
+        localStorage.setItem('user', JSON.stringify(fallbackUser));
       }
     }
   }, []);

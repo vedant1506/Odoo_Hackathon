@@ -12,6 +12,7 @@ import Profile from './pages/Profile';
 import MyLeaves from './pages/MyLeaves';
 import MyAttendance from './pages/MyAttendance';
 import Reports from './pages/Reports';
+import HRDashboard from './pages/HRDashboard';
 import './App.css';
 
 const RoleRedirect = () => {
@@ -30,7 +31,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/not-authorized" element={<NotAuthorized />} />
-          
+
           {/* Employee Routes */}
           <Route
             path="/dashboard"
@@ -72,7 +73,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          
+
           {/* Admin Routes */}
           <Route
             path="/admin-dashboard"
@@ -82,7 +83,22 @@ function App() {
               </ProtectedRoute>
             }
           />
+<<<<<<< HEAD
           
+=======
+
+          {/* HR Routes */}
+          <Route
+            path="/hr-dashboard"
+            element={
+              <ProtectedRoute allowedRoles={['HR']}>
+                <HRDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Default redirect based on role */}
+>>>>>>> f0e8ac630a6c28fbc37e9da7577f98703474850e
           <Route path="/" element={<RoleRedirect />} />
         </Routes>
       </Router>
