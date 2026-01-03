@@ -48,11 +48,16 @@ const approveRejectLeave = async (req, res) => {
 
 const getAllLeaves = async (req, res) => {
   try {
-    const leaves = await LeaveRequest.find();
+    const leaves = await LeaveRequest.find({});
     res.json(leaves);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-module.exports = { applyLeave, getLeaves, approveRejectLeave, getAllLeaves };
+module.exports = {
+  applyLeave,
+  getLeaves,
+  approveRejectLeave,
+  getAllLeaves
+};

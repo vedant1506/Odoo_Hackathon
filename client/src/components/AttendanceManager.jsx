@@ -218,23 +218,23 @@ const AttendanceManager = ({ onStatusChange }) => {
   return (
     <div className="space-y-6">
       {/* Check-in/Out Section */}
-      <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg p-8 text-white">
+      <div className="rounded-xl shadow-lg p-8 bg-gradient-to-br from-slate-800 via-slate-700 to-cyan-700 text-white">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div>
-            <h2 className="text-2xl font-bold mb-2">Attendance Tracking</h2>
-            <p className="text-indigo-100">
+            <h2 className="text-2xl font-bold mb-2">Attendance</h2>
+            <p className="text-slate-100 opacity-90">
               {isCheckedIn ? 'You are currently checked in' : 'Start your day by checking in'}
             </p>
             {todayRecord && (
-              <div className="mt-3 flex items-center gap-4 text-sm">
+              <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-slate-100">
                 {todayRecord.checkInTime && (
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full">
                     <LogIn className="w-4 h-4" />
                     <span>In: {formatTime(todayRecord.checkInTime)}</span>
                   </div>
                 )}
                 {todayRecord.checkOutTime && (
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full">
                     <LogOut className="w-4 h-4" />
                     <span>Out: {formatTime(todayRecord.checkOutTime)}</span>
                   </div>
@@ -246,10 +246,10 @@ const AttendanceManager = ({ onStatusChange }) => {
           <button
             onClick={isCheckedIn ? handleCheckOut : handleCheckIn}
             disabled={loading}
-            className={`flex items-center gap-3 px-8 py-4 rounded-lg font-semibold text-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed ${
+            className={`flex items-center gap-3 px-8 py-4 rounded-lg font-semibold text-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg ${
               isCheckedIn
-                ? 'bg-white text-purple-600 hover:bg-gray-100'
-                : 'bg-yellow-400 text-gray-900 hover:bg-yellow-300'
+                ? 'bg-white text-slate-800 hover:bg-slate-100'
+                : 'bg-cyan-400 text-slate-900 hover:bg-cyan-300'
             }`}
           >
             {loading ? (
@@ -273,10 +273,10 @@ const AttendanceManager = ({ onStatusChange }) => {
 
         {/* Message Display */}
         {message.text && (
-          <div className={`mt-4 p-3 rounded-lg ${
+          <div className={`mt-4 p-3 rounded-lg border ${
             message.type === 'success' 
-              ? 'bg-green-500 bg-opacity-20 border border-green-300' 
-              : 'bg-red-500 bg-opacity-20 border border-red-300'
+              ? 'bg-white/10 border-green-200 text-green-50' 
+              : 'bg-white/10 border-red-200 text-red-50'
           }`}>
             <p className="text-sm">{message.text}</p>
           </div>
@@ -284,22 +284,22 @@ const AttendanceManager = ({ onStatusChange }) => {
       </div>
 
       {/* Attendance Records Section */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+      <div className="bg-white rounded-xl shadow-md border border-slate-200">
         <div className="p-6 border-b border-gray-200">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h3 className="text-xl font-semibold text-gray-900">Attendance Records</h3>
-              <p className="text-sm text-gray-600">Track your attendance history</p>
+              <h3 className="text-xl font-semibold text-slate-900">Attendance Records</h3>
+              <p className="text-sm text-slate-500">Track your attendance history</p>
             </div>
             
             {/* View Toggle */}
-            <div className="flex items-center gap-2 bg-gray-100 p-1 rounded-lg">
+            <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-lg">
               <button
                 onClick={() => setViewMode('daily')}
                 className={`px-4 py-2 rounded-md font-medium text-sm transition-colors ${
                   viewMode === 'daily'
-                    ? 'bg-white text-indigo-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-white text-cyan-700 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 Daily View
@@ -308,8 +308,8 @@ const AttendanceManager = ({ onStatusChange }) => {
                 onClick={() => setViewMode('weekly')}
                 className={`px-4 py-2 rounded-md font-medium text-sm transition-colors ${
                   viewMode === 'weekly'
-                    ? 'bg-white text-indigo-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-white text-cyan-700 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 Weekly View
@@ -390,7 +390,7 @@ const AttendanceManager = ({ onStatusChange }) => {
                 <div key={index} className="border border-gray-200 rounded-lg p-5 hover:shadow-md transition-shadow">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
-                      <TrendingUp className="w-5 h-5 text-indigo-600" />
+                      <TrendingUp className="w-5 h-5 text-cyan-600" />
                       <h4 className="font-semibold text-gray-900">
                         Week of {formatDate(week.weekStart)}
                       </h4>

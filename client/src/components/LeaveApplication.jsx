@@ -184,23 +184,23 @@ const LeaveApplication = () => {
   return (
     <div className="space-y-6">
       {/* Leave Application Form */}
-      <div className="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl shadow-lg p-8 text-white">
+      <div className="rounded-xl shadow-lg p-8 bg-gradient-to-br from-slate-800 via-slate-700 to-cyan-700 text-white">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+          <div className="w-12 h-12 bg-white/15 rounded-lg flex items-center justify-center">
             <FileText className="w-6 h-6 text-white" />
           </div>
           <div>
             <h2 className="text-2xl font-bold">Apply for Leave</h2>
-            <p className="text-purple-100">Submit your leave request</p>
+            <p className="text-slate-100 opacity-90">Submit your leave request</p>
           </div>
         </div>
 
         {/* Message Display */}
         {message.text && (
-          <div className={`mb-6 p-4 rounded-lg ${
+          <div className={`mb-6 p-4 rounded-lg border ${
             message.type === 'success' 
-              ? 'bg-green-500 bg-opacity-20 border border-green-300' 
-              : 'bg-red-500 bg-opacity-20 border border-red-300'
+              ? 'bg-white/10 border-green-200 text-green-50' 
+              : 'bg-white/10 border-red-200 text-red-50'
           }`}>
             <p className="text-sm font-medium">{message.text}</p>
           </div>
@@ -217,7 +217,7 @@ const LeaveApplication = () => {
                 name="leaveType"
                 value={formData.leaveType}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-white bg-opacity-20 border border-white border-opacity-30 rounded-lg text-white placeholder-purple-200 focus:ring-2 focus:ring-white focus:ring-opacity-50 focus:border-transparent transition-all backdrop-blur-sm"
+                className="w-full px-4 py-3 bg-white/15 border border-white/30 rounded-lg text-white placeholder-slate-200 focus:ring-2 focus:ring-white focus:ring-opacity-70 focus:border-transparent transition-all backdrop-blur-sm"
               >
                 <option value="Paid" className="text-gray-900">Paid Leave</option>
                 <option value="Sick" className="text-gray-900">Sick Leave</option>
@@ -230,11 +230,11 @@ const LeaveApplication = () => {
               <label className="block text-sm font-medium text-white mb-2">
                 Total Days
               </label>
-              <div className="w-full px-4 py-3 bg-white bg-opacity-20 border border-white border-opacity-30 rounded-lg">
+              <div className="w-full px-4 py-3 bg-white/15 border border-white/30 rounded-lg">
                 <span className="text-2xl font-bold">
                   {calculateDays(formData.startDate, formData.endDate)}
                 </span>
-                <span className="text-sm text-purple-100 ml-2">
+                <span className="text-sm text-slate-100 ml-2">
                   {calculateDays(formData.startDate, formData.endDate) === 1 ? 'day' : 'days'}
                 </span>
               </div>
@@ -247,7 +247,7 @@ const LeaveApplication = () => {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Calendar className="h-5 w-5 text-purple-200" />
+                  <Calendar className="h-5 w-5 text-slate-200" />
                 </div>
                 <input
                   type="date"
@@ -255,7 +255,7 @@ const LeaveApplication = () => {
                   value={formData.startDate}
                   onChange={handleChange}
                   min={new Date().toISOString().split('T')[0]}
-                  className="w-full pl-10 pr-4 py-3 bg-white bg-opacity-20 border border-white border-opacity-30 rounded-lg text-white placeholder-purple-200 focus:ring-2 focus:ring-white focus:ring-opacity-50 focus:border-transparent transition-all backdrop-blur-sm"
+                  className="w-full pl-10 pr-4 py-3 bg-white/15 border border-white/30 rounded-lg text-white placeholder-slate-200 focus:ring-2 focus:ring-white focus:ring-opacity-70 focus:border-transparent transition-all backdrop-blur-sm"
                 />
               </div>
             </div>
@@ -267,7 +267,7 @@ const LeaveApplication = () => {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Calendar className="h-5 w-5 text-purple-200" />
+                  <Calendar className="h-5 w-5 text-slate-200" />
                 </div>
                 <input
                   type="date"
@@ -275,7 +275,7 @@ const LeaveApplication = () => {
                   value={formData.endDate}
                   onChange={handleChange}
                   min={formData.startDate || new Date().toISOString().split('T')[0]}
-                  className="w-full pl-10 pr-4 py-3 bg-white bg-opacity-20 border border-white border-opacity-30 rounded-lg text-white placeholder-purple-200 focus:ring-2 focus:ring-white focus:ring-opacity-50 focus:border-transparent transition-all backdrop-blur-sm"
+                  className="w-full pl-10 pr-4 py-3 bg-white/15 border border-white/30 rounded-lg text-white placeholder-slate-200 focus:ring-2 focus:ring-white focus:ring-opacity-70 focus:border-transparent transition-all backdrop-blur-sm"
                 />
               </div>
             </div>
@@ -288,7 +288,7 @@ const LeaveApplication = () => {
             </label>
             <div className="relative">
               <div className="absolute top-3 left-3 pointer-events-none">
-                <MessageSquare className="h-5 w-5 text-purple-200" />
+                <MessageSquare className="h-5 w-5 text-slate-200" />
               </div>
               <textarea
                 name="remarks"
@@ -296,7 +296,7 @@ const LeaveApplication = () => {
                 onChange={handleChange}
                 rows="4"
                 placeholder="Please provide a reason for your leave request..."
-                className="w-full pl-10 pr-4 py-3 bg-white bg-opacity-20 border border-white border-opacity-30 rounded-lg text-white placeholder-purple-200 focus:ring-2 focus:ring-white focus:ring-opacity-50 focus:border-transparent transition-all backdrop-blur-sm resize-none"
+                className="w-full pl-10 pr-4 py-3 bg-white/15 border border-white/30 rounded-lg text-white placeholder-slate-200 focus:ring-2 focus:ring-white focus:ring-opacity-70 focus:border-transparent transition-all backdrop-blur-sm resize-none"
               />
             </div>
           </div>
@@ -305,7 +305,7 @@ const LeaveApplication = () => {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full bg-white text-purple-600 py-3 px-6 rounded-lg font-semibold hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-purple-600 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
+            className="w-full bg-white text-slate-900 py-3 px-6 rounded-lg font-semibold hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-cyan-700 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
           >
             {submitting ? (
               <>
@@ -324,52 +324,52 @@ const LeaveApplication = () => {
 
       {/* Leave Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-5 rounded-lg shadow-md border border-slate-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Pending</p>
-              <p className="text-3xl font-bold text-yellow-600">{leaveStats.pending}</p>
+              <p className="text-sm text-slate-500">Pending</p>
+              <p className="text-3xl font-bold text-amber-600">{leaveStats.pending}</p>
             </div>
-            <Clock className="w-10 h-10 text-yellow-400" />
+            <Clock className="w-10 h-10 text-amber-400" />
           </div>
         </div>
-        <div className="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-5 rounded-lg shadow-md border border-slate-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Approved</p>
-              <p className="text-3xl font-bold text-green-600">{leaveStats.approved}</p>
+              <p className="text-sm text-slate-500">Approved</p>
+              <p className="text-3xl font-bold text-emerald-600">{leaveStats.approved}</p>
             </div>
-            <CheckCircle className="w-10 h-10 text-green-400" />
+            <CheckCircle className="w-10 h-10 text-emerald-400" />
           </div>
         </div>
-        <div className="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-5 rounded-lg shadow-md border border-slate-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Rejected</p>
-              <p className="text-3xl font-bold text-red-600">{leaveStats.rejected}</p>
+              <p className="text-sm text-slate-500">Rejected</p>
+              <p className="text-3xl font-bold text-rose-600">{leaveStats.rejected}</p>
             </div>
-            <XCircle className="w-10 h-10 text-red-400" />
+            <XCircle className="w-10 h-10 text-rose-400" />
           </div>
         </div>
       </div>
 
       {/* Leave Requests List */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-        <div className="p-6 border-b border-gray-200">
+      <div className="bg-white rounded-xl shadow-md border border-slate-200">
+        <div className="p-6 border-b border-slate-200">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h3 className="text-xl font-semibold text-gray-900">Leave Request History</h3>
-              <p className="text-sm text-gray-600">{leaveRequests.length} total requests</p>
+              <h3 className="text-xl font-semibold text-slate-900">Leave Request History</h3>
+              <p className="text-sm text-slate-500">{leaveRequests.length} total requests</p>
             </div>
             
             {/* Filter Buttons */}
-            <div className="flex items-center gap-2 bg-gray-100 p-1 rounded-lg">
+            <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-lg">
               <button
                 onClick={() => setFilterStatus('all')}
                 className={`px-4 py-2 rounded-md font-medium text-sm transition-colors ${
                   filterStatus === 'all'
-                    ? 'bg-white text-indigo-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-white text-cyan-700 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 All
@@ -378,8 +378,8 @@ const LeaveApplication = () => {
                 onClick={() => setFilterStatus('pending')}
                 className={`px-4 py-2 rounded-md font-medium text-sm transition-colors ${
                   filterStatus === 'pending'
-                    ? 'bg-white text-indigo-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-white text-cyan-700 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 Pending
@@ -388,8 +388,8 @@ const LeaveApplication = () => {
                 onClick={() => setFilterStatus('approved')}
                 className={`px-4 py-2 rounded-md font-medium text-sm transition-colors ${
                   filterStatus === 'approved'
-                    ? 'bg-white text-indigo-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-white text-cyan-700 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 Approved
@@ -398,8 +398,8 @@ const LeaveApplication = () => {
                 onClick={() => setFilterStatus('rejected')}
                 className={`px-4 py-2 rounded-md font-medium text-sm transition-colors ${
                   filterStatus === 'rejected'
-                    ? 'bg-white text-indigo-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-white text-cyan-700 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 Rejected
@@ -411,7 +411,7 @@ const LeaveApplication = () => {
         <div className="p-6">
           {loading ? (
             <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 mx-auto"></div>
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-cyan-600 mx-auto"></div>
               <p className="mt-4 text-gray-600">Loading leave requests...</p>
             </div>
           ) : filteredRequests.length > 0 ? (
