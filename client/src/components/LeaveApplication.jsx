@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { applyLeave, getLeaves } from '../api/api';
 import { 
   FileText, Calendar, Send, CheckCircle, XCircle, Clock,
-  AlertCircle, Filter, MessageSquare
+  AlertCircle, MessageSquare
 } from 'lucide-react';
 
 const LeaveApplication = () => {
@@ -320,7 +320,6 @@ const LeaveApplication = () => {
             )}
           </button>
         </form>
-        </div>
       </div>
 
       {/* Leave Statistics */}

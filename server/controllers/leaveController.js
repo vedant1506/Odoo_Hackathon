@@ -2,12 +2,16 @@ const LeaveRequest = require('../models/LeaveRequest');
 
 const applyLeave = async (req, res) => {
   try {
-    const { leaveType, startDate, endDate, remarks } = req.body;
+    const { leaveType, type, startDate, endDate, remarks } = req.body;
+    const normalizedType = leaveType || type; // accept either payload key
+    if (!normalizedType) {
+      return res.status(400).json({ message: 'Leave type is required.' });
+    }
     const employeeId = req.user.employeeId;
 
     const leave = new LeaveRequest({
       employeeId,
-      type: leaveType,
+      type: normalizedType,
       startDate: new Date(startDate),
       endDate: new Date(endDate),
       remarks
