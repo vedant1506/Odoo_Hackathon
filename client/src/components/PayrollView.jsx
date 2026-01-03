@@ -192,8 +192,4 @@ const PayrollView = () => {
   );
 };
 
-<<<<<<< HEAD
 export default PayrollView;
-=======
-export default PayrollView;
->>>>>>> 8906ede (bug fixed)
