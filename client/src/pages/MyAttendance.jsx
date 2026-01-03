@@ -21,7 +21,7 @@ const MyAttendance = () => {
   const fetchAttendance = async () => {
     try {
       setLoading(true);
-      const res = await api.get('/attendance/my-attendance');
+      const res = await api.get('/attendance');
       const data = res.data || [];
       setAttendance(data.reverse());
       
@@ -59,10 +59,8 @@ const MyAttendance = () => {
         return;
       }
 
-      await api.post('/attendance/mark', {
-        date: new Date().toISOString(),
-        status: 'Present',
-        checkInTime: new Date().toISOString()
+      await api.post('/attendance/checkin', {
+        date: new Date().toISOString()
       });
       
       alert('Attendance marked successfully!');
@@ -76,8 +74,7 @@ const MyAttendance = () => {
   const handleCheckOut = async () => {
     try {
       await api.post('/attendance/checkout', {
-        date: new Date().toISOString(),
-        checkOutTime: new Date().toISOString()
+        date: new Date().toISOString()
       });
       
       alert('Checked out successfully!');
@@ -123,7 +120,7 @@ const MyAttendance = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -133,10 +130,10 @@ const MyAttendance = () => {
           </div>
           <div className="flex items-center gap-3">
             <NotificationBell />
-            {todayRecord && todayRecord.checkInTime && !todayRecord.checkOutTime ? (
+            {todayRecord && todayRecord.checkIn && !todayRecord.checkOut ? (
               <button
                 onClick={handleCheckOut}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-xl font-semibold hover:from-orange-700 hover:to-red-700 transition-all shadow-lg"
+                className="flex items-center gap-2 px-4 py-2 bg-linear-to-r from-orange-600 to-red-600 text-white rounded-xl font-semibold hover:from-orange-700 hover:to-red-700 transition-all shadow-lg"
               >
                 <Clock className="w-4 h-4" />
                 Check Out
@@ -145,7 +142,7 @@ const MyAttendance = () => {
               <button
                 onClick={markAttendance}
                 disabled={todayRecord}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl font-semibold hover:from-emerald-700 hover:to-teal-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-4 py-2 bg-linear-to-r from-emerald-600 to-teal-600 text-white rounded-xl font-semibold hover:from-emerald-700 hover:to-teal-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <MapPin className="w-4 h-4" />
                 {todayRecord ? 'Already Checked In' : 'Check In Now'}
@@ -311,7 +308,7 @@ const MyAttendance = () => {
 // Daily View Component
 const DailyView = ({ loading, filteredAttendance, getStatusColor, getStatusIcon }) => (
   <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
-    <div className="px-6 py-4 bg-gradient-to-r from-cyan-50 to-blue-50 border-b border-slate-200">
+    <div className="px-6 py-4 bg-linear-to-r from-cyan-50 to-blue-50 border-b border-slate-200">
       <h2 className="font-semibold text-slate-800 flex items-center gap-2">
         <Clock className="w-5 h-5 text-cyan-600" />
         Attendance Records ({filteredAttendance.length})
@@ -353,10 +350,10 @@ const DailyView = ({ loading, filteredAttendance, getStatusColor, getStatusIcon 
                   {new Date(record.date).toLocaleDateString('en-US', { weekday: 'long' })}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-slate-600">
-                  {record.checkInTime ? new Date(record.checkInTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '-'}
+                  {record.checkIn ? new Date(record.checkIn).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '-'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-slate-600">
-                  {record.checkOutTime ? new Date(record.checkOutTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '-'}
+                  {record.checkOut ? new Date(record.checkOut).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '-'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 w-fit ${getStatusColor(record.status)}`}>
@@ -427,7 +424,7 @@ const WeeklyView = ({ attendance, getStatusColor }) => {
 
   return (
     <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
-      <div className="px-6 py-4 bg-gradient-to-r from-cyan-50 to-blue-50 border-b border-slate-200">
+      <div className="px-6 py-4 bg-linear-to-r from-cyan-50 to-blue-50 border-b border-slate-200">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold text-slate-800 flex items-center gap-2">
             <Calendar className="w-5 h-5 text-cyan-600" />
