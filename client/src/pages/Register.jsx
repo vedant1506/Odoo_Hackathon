@@ -100,6 +100,11 @@ const Register = () => {
     setErrorMessage('');
     setSuccessMessage('');
 
+    console.log('=== Registration Attempt ===');
+    console.log('Employee ID:', formData.employeeId);
+    console.log('Email:', formData.email);
+    console.log('Role:', formData.role);
+
     if (!validateForm()) {
       return;
     }
@@ -107,9 +112,12 @@ const Register = () => {
     setLoading(true);
 
     try {
+      console.log('Sending registration request...');
       const response = await register(formData);
+      console.log('Registration response:', response);
       
       if (response.data) {
+        console.log('Registration successful');
         setSuccessMessage('Account created successfully! Redirecting to login...');
         
         // Clear form
@@ -117,6 +125,7 @@ const Register = () => {
           employeeId: '',
           email: '',
           password: '',
+          confirmPassword: '',
           role: 'Employee'
         });
         
@@ -126,6 +135,8 @@ const Register = () => {
         }, 2000);
       }
     } catch (error) {
+      console.error('Registration error:', error);
+      console.error('Error response:', error.response);
       const message = error.response?.data?.message || error.response?.data?.error || 'Registration failed. Please try again.';
       setErrorMessage(message);
     } finally {

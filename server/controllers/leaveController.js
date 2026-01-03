@@ -4,27 +4,36 @@ const User = require('../models/User');
 
 const applyLeave = async (req, res) => {
   try {
+    console.log('=== Apply Leave Request ===');
+    console.log('Request body:', JSON.stringify(req.body, null, 2));
+    console.log('Request user:', JSON.stringify(req.user, null, 2));
+    
     const { leaveType, type, startDate, endDate, remarks, reason } = req.body;
     const normalizedType = leaveType || type; // accept either payload key
     const normalizedReason = reason || remarks; // accept either payload key
     
     if (!normalizedType) {
+      console.log('Validation failed: Leave type is missing');
       return res.status(400).json({ message: 'Leave type is required.' });
     }
     
     if (!startDate) {
+      console.log('Validation failed: Start date is missing');
       return res.status(400).json({ message: 'Start date is required.' });
     }
     
     if (!endDate) {
+      console.log('Validation failed: End date is missing');
       return res.status(400).json({ message: 'End date is required.' });
     }
     
     if (!req.user || !req.user.employeeId) {
+      console.log('Authentication failed: User or employeeId missing');
       return res.status(401).json({ message: 'User not authenticated properly.' });
     }
     
     const employeeId = req.user.employeeId;
+    console.log('Creating leave request for employee:', employeeId);
 
     const leave = new LeaveRequest({
       employeeId,
@@ -61,6 +70,7 @@ const applyLeave = async (req, res) => {
       );
     }
 
+    console.log('Leave request created successfully:', leave._id);
     res.status(201).json(leave);
   } catch (error) {
     console.error('Error in applyLeave:', error);

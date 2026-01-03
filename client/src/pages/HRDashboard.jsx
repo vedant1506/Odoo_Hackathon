@@ -143,7 +143,7 @@ const HRDashboard = () => {
                 </div>
                 <p className="text-sm text-slate-500">Review and decide requests</p>
               </div>
-              <LeaveApprovals onDecision={adminApproveLeave} />
+              <LeaveApprovals />
             </div>
 
             <div className="bg-white rounded-xl shadow-md border border-slate-200 p-4">

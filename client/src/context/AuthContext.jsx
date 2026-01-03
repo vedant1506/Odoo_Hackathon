@@ -50,15 +50,27 @@ export const AuthProvider = ({ children }) => {
 
   const loginUser = async (credentials) => {
     try {
+      console.log('AuthContext: Attempting login with', credentials.email);
       const response = await apiLogin(credentials);
+      console.log('AuthContext: Login API response:', response);
+      
       const { token: newToken, user: userData } = response.data;
+      
+      if (!newToken || !userData) {
+        console.error('AuthContext: Missing token or user data in response');
+        return { success: false, message: 'Invalid response from server' };
+      }
+      
+      console.log('AuthContext: Login successful for', userData.employeeId);
       localStorage.setItem('token', newToken);
       localStorage.setItem('user', JSON.stringify(userData));
       setToken(newToken);
       setUser(userData);
       setIsAuthenticated(true);
-      return { success: true, user: userData };
+      return { success: true, data: { user: userData } };
     } catch (error) {
+      console.error('AuthContext: Login error:', error);
+      console.error('AuthContext: Error response:', error.response);
       return { success: false, message: error.response?.data?.message || 'Login failed' };
     }
   };

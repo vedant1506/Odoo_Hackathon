@@ -13,6 +13,7 @@ const LeaveApprovals = () => {
   const [selectedLeave, setSelectedLeave] = useState(null);
   const [actionType, setActionType] = useState(''); // 'approve' or 'reject'
   const [adminComment, setAdminComment] = useState('');
+  const [employees, setEmployees] = useState({});
 
   useEffect(() => {
     if (!user) return; // wait for user to load
@@ -24,15 +25,32 @@ const LeaveApprovals = () => {
     }
 
     fetchLeaveRequests();
+    fetchEmployees();
   }, []);
+
+  const fetchEmployees = async () => {
+    try {
+      const response = await api.get('/users/employees');
+      const empMap = {};
+      (response.data || []).forEach(emp => {
+        empMap[emp.employeeId] = emp.name || emp.employeeId;
+      });
+      setEmployees(empMap);
+    } catch (err) {
+      console.error('Error fetching employees', err);
+    }
+  };
 
   const fetchLeaveRequests = async () => {
     try {
       setLoading(true);
+      console.log('Fetching leave requests...');
       const response = await api.get('/leaves/all');
+      console.log('Leave requests:', response.data);
       setLeaveRequests(response.data || []);
       setError(null);
     } catch (err) {
+      console.error('Error fetching leave requests:', err);
       setError(err.response?.data?.message || 'Failed to fetch leave requests');
     } finally {
       setLoading(false);
@@ -147,9 +165,10 @@ const LeaveApprovals = () => {
           <table className="min-w-full divide-y divide-gray-200 text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left font-semibold text-gray-600">Employee ID</th>
+                <th className="px-6 py-3 text-left font-semibold text-gray-600">Employee</th>
                 <th className="px-6 py-3 text-left font-semibold text-gray-600">Leave Type</th>
                 <th className="px-6 py-3 text-left font-semibold text-gray-600">Dates</th>
+                <th className="px-6 py-3 text-left font-semibold text-gray-600">Remarks</th>
                 <th className="px-6 py-3 text-left font-semibold text-gray-600">Status</th>
                 <th className="px-6 py-3 text-left font-semibold text-gray-600">Actions</th>
               </tr>
@@ -157,7 +176,10 @@ const LeaveApprovals = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredRequests.map((request) => (
                 <tr key={request._id} className="hover:bg-gray-50">
-                  <td className="px-6 py-3 whitespace-nowrap font-medium text-gray-900">{request.employeeId}</td>
+                  <td className="px-6 py-3 whitespace-nowrap">
+                    <div className="font-medium text-gray-900">{employees[request.employeeId] || request.employeeId}</div>
+                    <div className="text-xs text-gray-500">{request.employeeId}</div>
+                  </td>
                   <td className="px-6 py-3 whitespace-nowrap text-gray-700">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                       request.type === 'Paid' ? 'bg-emerald-100 text-emerald-800' :
@@ -169,6 +191,9 @@ const LeaveApprovals = () => {
                   </td>
                   <td className="px-6 py-3 whitespace-nowrap text-gray-700">
                     {formatDate(request.startDate)} — {formatDate(request.endDate)}
+                  </td>
+                  <td className="px-6 py-3 text-gray-600 max-w-xs truncate">
+                    {request.remarks || request.reason || '-'}
                   </td>
                   <td className="px-6 py-3 whitespace-nowrap">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -182,18 +207,25 @@ const LeaveApprovals = () => {
                     </span>
                   </td>
                   <td className="px-6 py-3 whitespace-nowrap space-x-2">
-                    <button
-                      onClick={() => handleApprove(request)}
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-md transition-colors"
-                    >
-                      Approve
-                    </button>
-                    <button
-                      onClick={() => handleReject(request)}
-                      className="bg-rose-600 hover:bg-rose-700 text-white px-3 py-2 rounded-md transition-colors"
-                    >
-                      Reject
-                    </button>
+                    {(request.status === 'Pending' || !request.status) && (
+                      <>
+                        <button
+                          onClick={() => handleApprove(request)}
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-md transition-colors text-xs font-medium"
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => handleReject(request)}
+                          className="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-md transition-colors text-xs font-medium"
+                        >
+                          Reject
+                        </button>
+                      </>
+                    )}
+                    {request.status && request.status !== 'Pending' && (
+                      <span className="text-xs text-gray-500 italic">Processed</span>
+                    )}
                   </td>
                 </tr>
               ))}

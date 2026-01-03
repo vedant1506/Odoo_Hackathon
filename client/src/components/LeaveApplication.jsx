@@ -76,6 +76,9 @@ const LeaveApplication = () => {
     e.preventDefault();
     setMessage({ type: '', text: '' });
 
+    console.log('=== Leave Form Submission ===');
+    console.log('Form Data:', formData);
+
     if (!validateForm()) {
       return;
     }
@@ -91,6 +94,7 @@ const LeaveApplication = () => {
         days: calculateDays(formData.startDate, formData.endDate)
       };
 
+      console.log('Sending leave data:', leaveData);
       await applyLeave(leaveData);
       
       setMessage({ 
@@ -109,16 +113,25 @@ const LeaveApplication = () => {
       // Refresh leave requests
       setTimeout(() => {
         fetchLeaveRequests();
+      }, 1000);
+      
+      // Clear success message after 5 seconds
+      setTimeout(() => {
         setMessage({ type: '', text: '' });
-      }, 2000);
+      }, 5000);
 
     } catch (error) {
       console.error('Leave submission error:', error);
       console.error('Error response:', error.response);
+      console.error('Error data:', error.response?.data);
       setMessage({ 
         type: 'error', 
-        text: error.response?.data?.message || 'Failed to submit leave request. Please try again.' 
+        text: error.response?.data?.message || error.message || 'Failed to submit leave request. Please try again.' 
       });
+      // Keep error message visible longer
+      setTimeout(() => {
+        setMessage({ type: '', text: '' });
+      }, 10000);
     } finally {
       setSubmitting(false);
     }

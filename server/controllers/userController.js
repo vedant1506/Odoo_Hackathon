@@ -175,43 +175,64 @@ const deleteUser = async (req, res) => {
 // Upload profile picture
 const uploadProfilePicture = async (req, res) => {
   try {
+    console.log('=== Upload Profile Picture ===');
+    console.log('User:', req.user.id);
+    
     // In a real application, you would use multer to handle file uploads
     // and store files in cloud storage (AWS S3, Cloudinary, etc.)
     // For now, we'll accept a base64 string or URL
     const { profilePicture } = req.body;
     
     if (!profilePicture) {
+      console.log('Validation failed: No profile picture provided');
       return res.status(400).json({ message: 'No profile picture provided' });
     }
+    
+    console.log('Profile picture size:', profilePicture.length);
 
     const user = await User.findById(req.user.id);
     if (!user) {
+      console.log('User not found:', req.user.id);
       return res.status(404).json({ message: 'User not found' });
     }
 
     user.profilePicture = profilePicture;
     await user.save();
 
+    console.log('Profile picture uploaded successfully');
     res.json({ profilePicture: user.profilePicture });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error uploading profile picture:', err);
+    res.status(500).json({ message: err.message || 'Server error' });
   }
 };
 
 // Upload document
 const uploadDocument = async (req, res) => {
   try {
+    console.log('=== Upload Document ===');
+    console.log('User:', req.user.id);
+    
     // In a real application, you would use multer to handle file uploads
     const { name, type, url } = req.body;
     
     if (!name || !type || !url) {
+      console.log('Validation failed: Missing fields', { name: !!name, type: !!type, url: !!url });
       return res.status(400).json({ message: 'Document name, type, and URL are required' });
     }
+    
+    console.log('Document info:', { name, type, size: url.length });
 
     const user = await User.findById(req.user.id);
     if (!user) {
+      console.log('User not found:', req.user.id);
       return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Check document size (base64 encoded)
+    if (url.length > 20 * 1024 * 1024) {
+      console.log('Document too large:', url.length);
+      return res.status(400).json({ message: 'Document size is too large. Maximum 10MB allowed.' });
     }
 
     user.documents.push({
@@ -223,10 +244,11 @@ const uploadDocument = async (req, res) => {
 
     await user.save();
 
+    console.log('Document uploaded successfully. Total documents:', user.documents.length);
     res.json({ documents: user.documents });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error uploading document:', err);
+    res.status(500).json({ message: err.message || 'Failed to upload document' });
   }
 };
 

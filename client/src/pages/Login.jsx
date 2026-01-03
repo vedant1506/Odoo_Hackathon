@@ -56,6 +56,9 @@ const Login = () => {
     e.preventDefault();
     setErrorMessage('');
 
+    console.log('=== Login Attempt ===');
+    console.log('Email:', formData.email);
+
     if (!validateForm()) {
       return;
     }
@@ -63,10 +66,13 @@ const Login = () => {
     setLoading(true);
 
     try {
+      console.log('Sending login request...');
       const result = await loginUser(formData);
+      console.log('Login result:', result);
       
       if (result.success) {
         const { user } = result.data;
+        console.log('Login successful, redirecting...', user.role);
         // Redirect based on role
         if (user.role === 'Admin') {
           navigate('/admin-dashboard');
@@ -76,9 +82,11 @@ const Login = () => {
           navigate('/dashboard');
         }
       } else {
+        console.error('Login failed:', result.message);
         setErrorMessage(result.message || 'Login failed. Please check your credentials.');
       }
     } catch (error) {
+      console.error('Login error:', error);
       setErrorMessage('An error occurred. Please try again.');
     } finally {
       setLoading(false);

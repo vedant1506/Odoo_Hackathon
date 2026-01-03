@@ -132,11 +132,14 @@ const Profile = () => {
 
     try {
       setLoading(true);
+      console.log('=== Upload Profile Picture ===');
+      console.log('File:', file.name, 'Size:', file.size);
       
       // Convert file to base64
       const reader = new FileReader();
       reader.onloadend = async () => {
         try {
+          console.log('Sending profile picture...');
           const res = await api.post('/users/upload-profile-picture', {
             profilePicture: reader.result
           });
@@ -145,13 +148,16 @@ const Profile = () => {
           setMessage({ type: 'success', text: 'Profile picture updated!' });
           setTimeout(() => setMessage({ type: '', text: '' }), 3000);
         } catch (err) {
-          setMessage({ type: 'error', text: 'Failed to upload profile picture' });
+          console.error('Profile picture upload error:', err);
+          console.error('Error response:', err.response);
+          setMessage({ type: 'error', text: err.response?.data?.message || 'Failed to upload profile picture' });
         } finally {
           setLoading(false);
         }
       };
       reader.readAsDataURL(file);
     } catch (err) {
+      console.error('Profile picture upload error:', err);
       setMessage({ type: 'error', text: 'Failed to upload profile picture' });
       setLoading(false);
     }
@@ -183,14 +189,18 @@ const Profile = () => {
           setProfileData({ ...profileData, documents: res.data.documents });
           setMessage({ type: 'success', text: 'Document uploaded successfully!' });
           setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+          // Reset file input
+          e.target.value = '';
         } catch (err) {
-          setMessage({ type: 'error', text: 'Failed to upload document' });
+          console.error('Document upload error:', err);
+          setMessage({ type: 'error', text: err.response?.data?.message || 'Failed to upload document' });
         } finally {
           setLoading(false);
         }
       };
       reader.readAsDataURL(file);
     } catch (err) {
+      console.error('Document upload error:', err);
       setMessage({ type: 'error', text: 'Failed to upload document' });
       setLoading(false);
     }
