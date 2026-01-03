@@ -71,12 +71,8 @@ const Login = () => {
       console.log('Login result:', result);
       
       if (result.success) {
-<<<<<<< HEAD
         const { user } = result.data;
         console.log('Login successful, redirecting...', user.role);
-=======
-        const user = result.user;
->>>>>>> f0e8ac630a6c28fbc37e9da7577f98703474850e
         // Redirect based on role
         if (user.role === 'Admin') {
           navigate('/admin-dashboard');
