@@ -206,8 +206,8 @@ const LeaveApplication = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Leave Type Dropdown */}
             <div>
               <label className="block text-sm font-medium text-white mb-2">
@@ -309,7 +309,7 @@ const LeaveApplication = () => {
           >
             {submitting ? (
               <>
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-purple-600"></div>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-cyan-600"></div>
                 Submitting...
               </>
             ) : (
@@ -320,6 +320,7 @@ const LeaveApplication = () => {
             )}
           </button>
         </form>
+        </div>
       </div>
 
       {/* Leave Statistics */}
