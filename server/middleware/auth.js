@@ -18,11 +18,23 @@ const auth = (req, res, next) => {
   }
 };
 
+const roleEquals = (role, targets = []) => {
+  const normalized = (role || '').toUpperCase();
+  return targets.map(r => r.toUpperCase()).includes(normalized);
+};
+
 const adminOnly = (req, res, next) => {
-  if (req.user.role !== 'Admin') {
+  if (!roleEquals(req.user.role, ['Admin'])) {
     return res.status(403).json({ message: 'Access denied' });
   }
   next();
 };
 
-module.exports = { auth, adminOnly };
+const hrOrAdmin = (req, res, next) => {
+  if (roleEquals(req.user.role, ['Admin', 'HR'])) {
+    return next();
+  }
+  return res.status(403).json({ message: 'Access denied' });
+};
+
+module.exports = { auth, adminOnly, hrOrAdmin };

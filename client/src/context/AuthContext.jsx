@@ -1,9 +1,20 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { login as apiLogin } from '../api/api';
 
+const decodeJwt = (token) => {
+  try {
+    const payload = token.split('.')[1];
+    return JSON.parse(atob(payload));
+  } catch (e) {
+    return null;
+  }
+};
+
 const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
+
+const normalizeRole = (role) => (role || '').toUpperCase();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -12,11 +23,28 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
     if (storedToken) {
-      // Optionally, verify token with backend
       setToken(storedToken);
       setIsAuthenticated(true);
-      // You might want to decode token to get user info, or fetch user data
+      if (storedUser) {
+        try {
+          setUser(JSON.parse(storedUser));
+        } catch (e) {
+          console.warn('Failed to parse stored user');
+        }
+      } else {
+        const payload = decodeJwt(storedToken);
+        if (payload?.role) {
+          const fallbackUser = {
+            id: payload.id,
+            employeeId: payload.employeeId,
+            role: payload.role,
+          };
+          setUser(fallbackUser);
+          localStorage.setItem('user', JSON.stringify(fallbackUser));
+        }
+      }
     }
   }, []);
 
@@ -25,10 +53,11 @@ export const AuthProvider = ({ children }) => {
       const response = await apiLogin(credentials);
       const { token: newToken, user: userData } = response.data;
       localStorage.setItem('token', newToken);
+      localStorage.setItem('user', JSON.stringify(userData));
       setToken(newToken);
       setUser(userData);
       setIsAuthenticated(true);
-      return { success: true };
+      return { success: true, user: userData };
     } catch (error) {
       return { success: false, message: error.response?.data?.message || 'Login failed' };
     }
@@ -36,14 +65,21 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     setToken(null);
     setUser(null);
     setIsAuthenticated(false);
   };
 
-  const isAdmin = () => {
-    return user && (user.role === 'Admin' || user.role === 'HR');
+  const hasRole = (roles = []) => {
+    if (!roles.length) return true;
+    const userRole = normalizeRole(user?.role);
+    const target = roles.map(normalizeRole);
+    return target.includes(userRole);
   };
+
+  const isAdmin = () => normalizeRole(user?.role) === 'ADMIN';
+  const isHR = () => normalizeRole(user?.role) === 'HR';
 
   return (
     <AuthContext.Provider value={{
@@ -52,7 +88,9 @@ export const AuthProvider = ({ children }) => {
       isAuthenticated,
       loginUser,
       logout,
-      isAdmin
+      isAdmin,
+      isHR,
+      hasRole
     }}>
       {children}
     </AuthContext.Provider>

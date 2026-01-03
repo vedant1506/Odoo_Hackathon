@@ -1,16 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/api';
 
-const AttendanceTracker = () => {
-  const { isAdmin } = useAuth();
+const AttendanceTracker = ({ compact = false }) => {
+  const { hasRole, user } = useAuth();
   const [attendanceRecords, setAttendanceRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
-    if (!isAdmin()) {
+    if (!user) return; // wait for user to load
+
+    if (!hasRole(['Admin', 'HR'])) {
       setError('Unauthorized access');
       setLoading(false);
       return;
@@ -24,11 +27,15 @@ const AttendanceTracker = () => {
       setLoading(true);
       // Fetch all attendance records
       const response = await api.get('/attendance/all');
-      // Filter by selected date if needed
-      const filtered = response.data.filter(record => {
-        const recordDate = new Date(record.date).toISOString().split('T')[0];
-        return recordDate === selectedDate;
-      });
+      const filtered = response.data
+        .filter(record => {
+          const recordDate = new Date(record.date).toISOString().split('T')[0];
+          return recordDate === selectedDate;
+        })
+        .filter(record =>
+          search ? (record.employeeId || '').toLowerCase().includes(search.toLowerCase()) : true
+        )
+        .sort((a, b) => (a.employeeId || '').localeCompare(b.employeeId || ''));
       setAttendanceRecords(filtered);
       setError(null);
     } catch (err) {
@@ -63,6 +70,21 @@ const AttendanceTracker = () => {
     });
   };
 
+  const stats = useMemo(() => {
+    return attendanceRecords.reduce(
+      (acc, r) => {
+        const s = r.status || 'Present';
+        if (s === 'Present') acc.present += 1;
+        else if (s === 'Late') acc.late += 1;
+        else if (s === 'Absent') acc.absent += 1;
+        else if (s === 'Leave') acc.leave += 1;
+        acc.total += 1;
+        return acc;
+      },
+      { present: 0, late: 0, absent: 0, leave: 0, total: 0 }
+    );
+  }, [attendanceRecords]);
+
   if (loading) {
     return <div className="text-center py-8">Loading attendance records...</div>;
   }
@@ -72,20 +94,30 @@ const AttendanceTracker = () => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Attendance Overview</h2>
-        <div className="flex items-center space-x-2">
-          <label htmlFor="date" className="text-sm font-medium text-gray-700">
-            Date:
-          </label>
+    <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-800">Attendance Overview</h2>
+          <p className="text-sm text-gray-500">Present {stats.present} · Late {stats.late} · Absent {stats.absent}</p>
+        </div>
+        <div className="flex flex-wrap gap-3 items-center">
+          <label htmlFor="date" className="text-sm font-medium text-gray-700">Date:</label>
           <input
             type="date"
             id="date"
             value={selectedDate}
             onChange={(e) => setSelectedDate(e.target.value)}
-            className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"
           />
+          {!compact && (
+            <input
+              type="text"
+              placeholder="Search employee"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-cyan-500"
+            />
+          )}
         </div>
       </div>
 
@@ -93,42 +125,28 @@ const AttendanceTracker = () => {
         <p className="text-gray-500 text-center py-8">No attendance records for this date</p>
       ) : (
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
+          <table className="min-w-full divide-y divide-gray-200 text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Employee ID
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Check In
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Check Out
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
+                <th className="px-6 py-3 text-left font-semibold text-gray-600">Employee ID</th>
+                {!compact && <th className="px-6 py-3 text-left font-semibold text-gray-600">Date</th>}
+                <th className="px-6 py-3 text-left font-semibold text-gray-600">Check In</th>
+                <th className="px-6 py-3 text-left font-semibold text-gray-600">Check Out</th>
+                <th className="px-6 py-3 text-left font-semibold text-gray-600">Status</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {attendanceRecords.map((record) => (
                 <tr key={record._id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {record.employeeId}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(record.date).toLocaleDateString('en-US')}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {formatTime(record.checkIn)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {formatTime(record.checkOut)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-3 whitespace-nowrap font-medium text-gray-900">{record.employeeId}</td>
+                  {!compact && (
+                    <td className="px-6 py-3 whitespace-nowrap text-gray-700">
+                      {new Date(record.date).toLocaleDateString('en-US')}
+                    </td>
+                  )}
+                  <td className="px-6 py-3 whitespace-nowrap text-gray-700">{formatTime(record.checkIn)}</td>
+                  <td className="px-6 py-3 whitespace-nowrap text-gray-700">{formatTime(record.checkOut)}</td>
+                  <td className="px-6 py-3 whitespace-nowrap">
                     <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(record.status)}`}>
                       {record.status}
                     </span>
@@ -140,26 +158,23 @@ const AttendanceTracker = () => {
         </div>
       )}
 
-      <div className="mt-6 flex justify-center space-x-4">
-        <div className="flex items-center space-x-2">
-          <div className="w-4 h-4 bg-green-500 rounded"></div>
-          <span className="text-sm text-gray-600">Present</span>
+      {!compact && (
+        <div className="mt-4 flex flex-wrap gap-4">
+          <Legend color="bg-green-500" label="Present" />
+          <Legend color="bg-yellow-500" label="Late" />
+          <Legend color="bg-red-500" label="Absent" />
+          <Legend color="bg-blue-500" label="Leave" />
         </div>
-        <div className="flex items-center space-x-2">
-          <div className="w-4 h-4 bg-red-500 rounded"></div>
-          <span className="text-sm text-gray-600">Absent</span>
-        </div>
-        <div className="flex items-center space-x-2">
-          <div className="w-4 h-4 bg-yellow-500 rounded"></div>
-          <span className="text-sm text-gray-600">Half-day</span>
-        </div>
-        <div className="flex items-center space-x-2">
-          <div className="w-4 h-4 bg-blue-500 rounded"></div>
-          <span className="text-sm text-gray-600">Leave</span>
-        </div>
-      </div>
+      )}
     </div>
   );
 };
+
+const Legend = ({ color, label }) => (
+  <div className="flex items-center space-x-2">
+    <div className={`w-4 h-4 rounded ${color}`}></div>
+    <span className="text-sm text-gray-600">{label}</span>
+  </div>
+);
 
 export default AttendanceTracker;

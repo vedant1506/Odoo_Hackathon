@@ -65,8 +65,15 @@ const Login = () => {
       const result = await loginUser(formData);
       
       if (result.success) {
-        // Redirect to dashboard
-        navigate('/dashboard');
+        // Redirect based on role
+        const role = result.user?.role;
+        if (role === 'Admin') {
+          navigate('/admin-dashboard');
+        } else if (role === 'HR') {
+          navigate('/hr-dashboard');
+        } else {
+          navigate('/dashboard');
+        }
       } else {
         setErrorMessage(result.message || 'Login failed. Please check your credentials.');
       }
