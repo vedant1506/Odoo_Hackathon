@@ -17,24 +17,33 @@ const PayrollView = () => {
       setLoading(true);
       const response = await getProfile();
       
-      // Mock payroll data structure since backend may not have this yet
-      // In production, this would come from a dedicated payroll endpoint
-      const mockPayrollData = {
-        employeeId: response.data[0]?.employeeId || user?.employeeId,
-        basicPay: 40000,
-        allowances: {
-          houseRent: 10000,
-          transportation: 3000,
-          medical: 2000
-        },
-        deductions: {
-          tax: 5000,
-          insurance: 1500,
-          providentFund: 2000
-        }
+      // Get salary data from user profile
+      const userData = Array.isArray(response.data) ? response.data[0] : response.data;
+      const salary = userData?.salary || {
+        basic: 0,
+        hra: 0,
+        allowances: 0,
+        deductions: 0,
+        total: 0
       };
       
-      setPayrollData(mockPayrollData);
+      const payroll = {
+        employeeId: userData?.employeeId || user?.employeeId,
+        name: userData?.name || 'Employee',
+        department: userData?.department || 'N/A',
+        designation: userData?.designation || 'N/A',
+        basicPay: salary.basic || 0,
+        allowances: {
+          hra: salary.hra || 0,
+          otherAllowances: salary.allowances || 0
+        },
+        deductions: {
+          totalDeductions: salary.deductions || 0
+        },
+        netSalary: salary.total || 0
+      };
+      
+      setPayrollData(payroll);
       setError(null);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch payroll data');
@@ -48,9 +57,9 @@ const PayrollView = () => {
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'INR'
     }).format(amount);
   };
 
@@ -84,13 +93,21 @@ const PayrollView = () => {
   const totalAllowances = calculateTotal(payrollData.allowances);
   const totalDeductions = calculateTotal(payrollData.deductions);
   const grossSalary = payrollData.basicPay + totalAllowances;
-  const netSalary = grossSalary - totalDeductions;
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6 max-w-4xl mx-auto">
       <div className="border-b pb-4 mb-6">
         <h2 className="text-2xl font-bold text-gray-800">Payroll Information</h2>
-        <p className="text-sm text-gray-600 mt-1">Employee ID: {payrollData.employeeId}</p>
+        <div className="mt-2 grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <p className="text-gray-600">Employee ID: <span className="font-semibold text-gray-800">{payrollData.employeeId}</span></p>
+            <p className="text-gray-600">Name: <span className="font-semibold text-gray-800">{payrollData.name}</span></p>
+          </div>
+          <div>
+            <p className="text-gray-600">Department: <span className="font-semibold text-gray-800">{payrollData.department}</span></p>
+            <p className="text-gray-600">Designation: <span className="font-semibold text-gray-800">{payrollData.designation}</span></p>
+          </div>
+        </div>
       </div>
 
       {/* Basic Pay Section */}
@@ -171,11 +188,11 @@ const PayrollView = () => {
               - {formatCurrency(totalDeductions)}
             </span>
           </div>
-          <div className="bg-gray-100 rounded-lg p-4 mt-4">
+          <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-lg p-4 mt-4">
             <div className="flex justify-between items-center">
               <span className="text-xl font-bold text-gray-800">Net Salary</span>
-              <span className="text-2xl font-bold text-green-600">
-                {formatCurrency(netSalary)}
+              <span className="text-2xl font-bold text-emerald-600">
+                {formatCurrency(payrollData.netSalary || (grossSalary - totalDeductions))}
               </span>
             </div>
           </div>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { register } from '../api/api';
-import { UserPlus, Mail, Lock, IdCard, Users, AlertCircle, CheckCircle } from 'lucide-react';
+import { UserPlus, Mail, Lock, IdCard, Users, AlertCircle, CheckCircle, Eye, EyeOff, Briefcase, Shield, User } from 'lucide-react';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -10,6 +10,7 @@ const Register = () => {
     employeeId: '',
     email: '',
     password: '',
+    confirmPassword: '',
     role: 'Employee'
   });
   
@@ -17,6 +18,8 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

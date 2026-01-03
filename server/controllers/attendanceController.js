@@ -51,8 +51,20 @@ const checkOut = async (req, res) => {
 
 const getAttendance = async (req, res) => {
   try {
-    const employeeId = req.user.employeeId;
-    const records = await Attendance.find({ employeeId });
+    const { employeeId } = req.params;
+    
+    // If employeeId is provided in params, check authorization
+    if (employeeId) {
+      // Check if user is admin/HR or requesting their own data
+      if (req.user.role !== 'Admin' && req.user.role !== 'HR' && req.user.employeeId !== employeeId) {
+        return res.status(403).json({ message: 'Not authorized' });
+      }
+      const records = await Attendance.find({ employeeId });
+      return res.json(records);
+    }
+    
+    // Otherwise return current user's attendance
+    const records = await Attendance.find({ employeeId: req.user.employeeId });
     res.json(records);
   } catch (error) {
     res.status(500).json({ message: error.message });

@@ -7,7 +7,7 @@ const leaveRequestSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['Paid', 'Sick', 'Unpaid'],
+    enum: ['Paid', 'Sick', 'Unpaid', 'Sick Leave', 'Casual Leave', 'Vacation', 'Personal'],
     required: true
   },
   startDate: {
@@ -25,7 +25,15 @@ const leaveRequestSchema = new mongoose.Schema({
   },
   remarks: {
     type: String,
-    required: false
+    default: ''
+  },
+  reason: {
+    type: String,
+    default: ''
+  },
+  adminComments: {
+    type: String,
+    default: ''
   }
 }, {
   timestamps: true

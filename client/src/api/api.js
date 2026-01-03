@@ -38,7 +38,7 @@ export const getLeaves = () => api.get('/leaves');
 // Admin functions
 export const adminGetEmployees = () => api.get('/users/employees');
 export const adminGetAllLeaves = () => api.get('/leaves/all');
-export const adminApproveLeave = (id, status) => api.post('/leaves/approve-reject', { id, status });
+export const adminApproveLeave = (id, status, adminComments = '') => api.post('/leaves/approve-reject', { id, status, adminComments });
 export const adminGetPayroll = () => api.get('/payroll'); // Assuming a route, but not implemented yet
 
 export default api;

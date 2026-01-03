@@ -24,6 +24,7 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/attendance', require('./routes/attendanceRoutes'));
 app.use('/api/leaves', require('./routes/leaveRoutes'));
+app.use('/api/notifications', require('./routes/notificationRoutes'));
 
 // Start server
 const PORT = process.env.PORT || 5000;

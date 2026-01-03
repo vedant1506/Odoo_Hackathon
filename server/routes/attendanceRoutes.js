@@ -8,5 +8,6 @@ router.post('/checkin', auth, checkIn);
 router.post('/checkout', auth, checkOut);
 router.get('/', auth, getAttendance);
 router.get('/all', auth, hrOrAdmin, getAllAttendance);
+router.get('/:employeeId', auth, getAttendance);
 
 module.exports = router;

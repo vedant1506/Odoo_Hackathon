@@ -1,1 +1,17 @@
 @import "tailwindcss";
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .salary-slip {
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 20px !important;
+  }
+  
+  body {
+    background: white !important;
+  }
+}

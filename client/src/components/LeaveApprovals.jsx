@@ -9,6 +9,10 @@ const LeaveApprovals = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({ status: 'Pending', search: '' });
+  const [showCommentModal, setShowCommentModal] = useState(false);
+  const [selectedLeave, setSelectedLeave] = useState(null);
+  const [actionType, setActionType] = useState(''); // 'approve' or 'reject'
+  const [adminComment, setAdminComment] = useState('');
 
   useEffect(() => {
     if (!user) return; // wait for user to load
@@ -35,21 +39,28 @@ const LeaveApprovals = () => {
     }
   };
 
-  const handleApprove = async (id) => {
-    try {
-      await adminApproveLeave(id, 'Approved');
-      setLeaveRequests((prev) => prev.filter(req => req._id !== id));
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to approve leave');
-    }
+  const handleApprove = async (leave) => {
+    setSelectedLeave(leave);
+    setActionType('approve');
+    setShowCommentModal(true);
   };
 
-  const handleReject = async (id) => {
+  const handleReject = async (leave) => {
+    setSelectedLeave(leave);
+    setActionType('reject');
+    setShowCommentModal(true);
+  };
+
+  const handleSubmitDecision = async () => {
     try {
-      await adminApproveLeave(id, 'Rejected');
-      setLeaveRequests((prev) => prev.filter(req => req._id !== id));
+      const status = actionType === 'approve' ? 'Approved' : 'Rejected';
+      await adminApproveLeave(selectedLeave._id, status, adminComment);
+      await fetchLeaveRequests();
+      setShowCommentModal(false);
+      setAdminComment('');
+      setSelectedLeave(null);
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to reject leave');
+      alert(err.response?.data?.message || `Failed to ${actionType} leave`);
     }
   };
 
@@ -97,6 +108,7 @@ const LeaveApprovals = () => {
   }
 
   return (
+    <>
     <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -171,13 +183,13 @@ const LeaveApprovals = () => {
                   </td>
                   <td className="px-6 py-3 whitespace-nowrap space-x-2">
                     <button
-                      onClick={() => handleApprove(request._id)}
+                      onClick={() => handleApprove(request)}
                       className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-md transition-colors"
                     >
                       Approve
                     </button>
                     <button
-                      onClick={() => handleReject(request._id)}
+                      onClick={() => handleReject(request)}
                       className="bg-rose-600 hover:bg-rose-700 text-white px-3 py-2 rounded-md transition-colors"
                     >
                       Reject
@@ -190,6 +202,66 @@ const LeaveApprovals = () => {
         </div>
       )}
     </div>
+
+    {/* Comment Modal */}
+    {showCommentModal && (
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+          <h3 className="text-xl font-bold text-slate-800 mb-4">
+            {actionType === 'approve' ? 'Approve' : 'Reject'} Leave Request
+          </h3>
+          
+          {selectedLeave && (
+            <div className="mb-4 p-3 bg-slate-50 rounded-lg">
+              <p className="text-sm text-slate-600"><span className="font-semibold">Employee:</span> {selectedLeave.employeeId}</p>
+              <p className="text-sm text-slate-600"><span className="font-semibold">Type:</span> {selectedLeave.type}</p>
+              <p className="text-sm text-slate-600"><span className="font-semibold">Dates:</span> {formatDate(selectedLeave.startDate)} - {formatDate(selectedLeave.endDate)}</p>
+              {selectedLeave.remarks && (
+                <p className="text-sm text-slate-600 mt-2"><span className="font-semibold">Remarks:</span> {selectedLeave.remarks}</p>
+              )}
+            </div>
+          )}
+
+          <div className="mb-4">
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
+              Add Comment {actionType === 'reject' ? '(Required)' : '(Optional)'}
+            </label>
+            <textarea
+              value={adminComment}
+              onChange={(e) => setAdminComment(e.target.value)}
+              rows="4"
+              placeholder={actionType === 'approve' ? 'Add any notes...' : 'Please provide a reason for rejection...'}
+              className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent resize-none"
+            />
+          </div>
+
+          <div className="flex gap-3">
+            <button
+              onClick={() => {
+                setShowCommentModal(false);
+                setAdminComment('');
+                setSelectedLeave(null);
+              }}
+              className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSubmitDecision}
+              disabled={actionType === 'reject' && !adminComment.trim()}
+              className={`flex-1 px-4 py-2 text-white rounded-xl font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                actionType === 'approve' 
+                  ? 'bg-emerald-600 hover:bg-emerald-700' 
+                  : 'bg-rose-600 hover:bg-rose-700'
+              }`}
+            >
+              {actionType === 'approve' ? 'Approve' : 'Reject'}
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 };
 

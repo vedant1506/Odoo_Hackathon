@@ -84,7 +84,10 @@ const LeaveApplication = () => {
 
     try {
       const leaveData = {
-        ...formData,
+        type: formData.leaveType,
+        startDate: formData.startDate,
+        endDate: formData.endDate,
+        remarks: formData.remarks,
         days: calculateDays(formData.startDate, formData.endDate)
       };
 
@@ -110,6 +113,8 @@ const LeaveApplication = () => {
       }, 2000);
 
     } catch (error) {
+      console.error('Leave submission error:', error);
+      console.error('Error response:', error.response);
       setMessage({ 
         type: 'error', 
         text: error.response?.data?.message || 'Failed to submit leave request. Please try again.' 
@@ -446,6 +451,16 @@ const LeaveApplication = () => {
                         <div className="flex items-start gap-2 text-sm text-gray-700 mt-2">
                           <MessageSquare className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
                           <p className="line-clamp-2">{request.remarks}</p>
+                        </div>
+                      )}
+                      
+                      {request.adminComments && (
+                        <div className="flex items-start gap-2 text-sm mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                          <MessageSquare className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                          <div>
+                            <p className="font-semibold text-blue-900 text-xs mb-1">Admin Comment:</p>
+                            <p className="text-blue-800">{request.adminComments}</p>
+                          </div>
                         </div>
                       )}
                     </div>
