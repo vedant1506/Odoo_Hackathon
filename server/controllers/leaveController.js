@@ -2,14 +2,15 @@ const LeaveRequest = require('../models/LeaveRequest');
 
 const applyLeave = async (req, res) => {
   try {
-    const { type, startDate, endDate } = req.body;
+    const { leaveType, startDate, endDate, remarks } = req.body;
     const employeeId = req.user.employeeId;
 
     const leave = new LeaveRequest({
       employeeId,
-      type,
+      type: leaveType,
       startDate: new Date(startDate),
-      endDate: new Date(endDate)
+      endDate: new Date(endDate),
+      remarks
     });
 
     await leave.save();
