@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 
 const PayrollView = () => {
   const { user } = useAuth();
-  const [payrollData, setPayrollData]    = useState(null);
+  const [payrollData, setPayrollData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -192,4 +192,8 @@ const PayrollView = () => {
   );
 };
 
+<<<<<<< HEAD
 export default PayrollView;
+=======
+export default PayrollView;
+>>>>>>> 8906ede (bug fixed)
