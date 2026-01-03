@@ -2,6 +2,9 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+// Fallback secret for dev; prefer setting JWT_SECRET in .env
+const JWT_SECRET = process.env.JWT_SECRET || 'dev_fallback_secret_change_me';
+
 const signUp = async (req, res) => {
   try {
     const { employeeId, email, password, role } = req.body;
@@ -48,7 +51,11 @@ const signIn = async (req, res) => {
     }
 
     // Generate JWT
-    const token = jwt.sign({ id: user._id, role: user.role, employeeId: user.employeeId }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign(
+      { id: user._id, role: user.role, employeeId: user.employeeId },
+      JWT_SECRET,
+      { expiresIn: '1h' }
+    );
 
     res.json({ token, user: { id: user._id, employeeId: user.employeeId, email: user.email, role: user.role } });
   } catch (error) {

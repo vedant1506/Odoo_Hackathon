@@ -1,5 +1,8 @@
 const jwt = require('jsonwebtoken');
 
+// Fallback to a default for local dev so missing env doesn't crash auth
+const JWT_SECRET = process.env.JWT_SECRET || 'dev_fallback_secret_change_me';
+
 const auth = (req, res, next) => {
   const token = req.header('Authorization')?.replace('Bearer ', '');
   if (!token) {
@@ -7,7 +10,7 @@ const auth = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded;
     next();
   } catch (error) {
