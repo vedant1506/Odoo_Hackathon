@@ -96,9 +96,9 @@ const HRDashboard = () => {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {/* Summary cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <SummaryCard
             icon={<Users className="w-6 h-6" />}
             title="Employees"
@@ -133,35 +133,33 @@ const HRDashboard = () => {
         </div>
 
         {/* HR tools */}
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white rounded-xl shadow-md border border-slate-200 p-4">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <Briefcase className="w-5 h-5 text-cyan-600" />
-                  <h2 className="text-lg font-semibold text-slate-800">Leave Approvals</h2>
-                </div>
-                <p className="text-sm text-slate-500">Review and decide requests</p>
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {/* Employee Directory - Takes 2 columns */}
+          <div className="lg:col-span-2 bg-white rounded-lg shadow-sm border border-slate-200 p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Users className="w-5 h-5 text-cyan-600" />
+              <h2 className="text-lg font-semibold text-slate-800">Employee Directory</h2>
+              <p className="text-xs text-slate-500 ml-auto">Manage salaries</p>
+            </div>
+            <UserList />
+          </div>
+
+          {/* Right sidebar - stacked sections */}
+          <div className="space-y-4">
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Briefcase className="w-5 h-5 text-cyan-600" />
+                <h2 className="text-base font-semibold text-slate-800">Leave Approvals</h2>
               </div>
               <LeaveApprovals />
             </div>
 
-            <div className="bg-white rounded-xl shadow-md border border-slate-200 p-4">
-              <div className="flex items-center gap-2 mb-4">
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-4">
+              <div className="flex items-center gap-2 mb-3">
                 <Calendar className="w-5 h-5 text-cyan-600" />
-                <h2 className="text-lg font-semibold text-slate-800">Attendance Snapshot</h2>
+                <h2 className="text-base font-semibold text-slate-800">Attendance</h2>
               </div>
               <AttendanceTracker compact />
-            </div>
-          </div>
-
-          <div className="space-y-6">
-            <div className="bg-white rounded-xl shadow-md border border-slate-200 p-4">
-              <div className="flex items-center gap-2 mb-4">
-                <Users className="w-5 h-5 text-cyan-600" />
-                <h2 className="text-lg font-semibold text-slate-800">Employee Directory</h2>
-              </div>
-              <UserList />
             </div>
           </div>
         </section>

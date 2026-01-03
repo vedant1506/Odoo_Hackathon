@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Calendar, Clock, TrendingUp, User, LogOut, Bell, Plus, CheckCircle, XCircle, AlertCircle, FileText, MapPin } from 'lucide-react';
+import { Calendar, Clock, TrendingUp, User, LogOut, Bell, Plus, CheckCircle, XCircle, AlertCircle, FileText, MapPin, LogIn, LogOut as LogOutIcon } from 'lucide-react';
 import api from '../api/api';
 import NotificationBell from '../components/NotificationBell';
 
@@ -19,7 +19,20 @@ const EmployeeDashboard = () => {
   });
   const [recentLeaves, setRecentLeaves] = useState([]);
   const [recentAttendance, setRecentAttendance] = useState([]);
+  const [todayAttendance, setTodayAttendance] = useState(null);
   const [showLeaveModal, setShowLeaveModal] = useState(false);
+
+  const dayKeyLocal = (value) => {
+    try {
+      const d = value ? new Date(value) : new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    } catch {
+      return '';
+    }
+  };
 
   useEffect(() => {
     fetchDashboardData();
@@ -64,6 +77,10 @@ const EmployeeDashboard = () => {
 
       setRecentLeaves(leaves.slice(0, 5));
       setRecentAttendance(attendance.slice(0, 7));
+
+      const todayKey = dayKeyLocal();
+      const todaysRecord = attendance.find(a => a?.date && dayKeyLocal(a.date) === todayKey);
+      setTodayAttendance(todaysRecord || null);
     } catch (err) {
       console.error('Error fetching dashboard data', err);
     } finally {
@@ -76,19 +93,48 @@ const EmployeeDashboard = () => {
     navigate('/login');
   };
 
-  const markAttendance = async () => {
+  const handleCheckIn = async () => {
     try {
-      await api.post('/attendance/mark', {
-        date: new Date().toISOString(),
-        status: 'Present',
-        checkInTime: new Date().toISOString()
+      const nowIso = new Date().toISOString();
+      const res = await api.post('/attendance/checkin', {
+        date: nowIso,
+        checkInTime: nowIso,
       });
-      fetchDashboardData();
+      if (res?.data) {
+        setTodayAttendance(res.data);
+      }
+      await fetchDashboardData();
     } catch (err) {
-      console.error('Error marking attendance', err);
-      alert('Error marking attendance. You may have already checked in today.');
+      console.error('Error checking in', err);
+      const msg = err.response?.data?.message;
+      // If backend says already checked in, refresh so UI switches to Check Out.
+      if (typeof msg === 'string' && msg.toLowerCase().includes('already checked in')) {
+        await fetchDashboardData();
+        return;
+      }
+      alert(msg || 'Failed to check in. Please try again.');
     }
   };
+
+  const handleCheckOut = async () => {
+    try {
+      const nowIso = new Date().toISOString();
+      const res = await api.post('/attendance/checkout', {
+        date: nowIso,
+        checkOutTime: nowIso,
+      });
+      if (res?.data) {
+        setTodayAttendance(res.data);
+      }
+      await fetchDashboardData();
+    } catch (err) {
+      console.error('Error checking out', err);
+      alert(err.response?.data?.message || 'Failed to check out. Please try again.');
+    }
+  };
+
+  const isCheckedIn = Boolean(todayAttendance?.checkInTime && !todayAttendance?.checkOutTime);
+  const isCheckedOut = Boolean(todayAttendance?.checkInTime && todayAttendance?.checkOutTime);
 
   const getStatusColor = (status) => {
     const s = status?.toLowerCase();
@@ -145,14 +191,31 @@ const EmployeeDashboard = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Quick Actions */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <button
-            onClick={markAttendance}
-            className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white p-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
-          >
-            <MapPin className="w-8 h-8 mb-3" />
-            <h3 className="font-semibold text-lg">Check In</h3>
-            <p className="text-sm text-emerald-100 mt-1">Mark attendance now</p>
-          </button>
+          {!isCheckedIn ? (
+            <button
+              onClick={handleCheckIn}
+              disabled={loading || isCheckedOut}
+              className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white p-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
+            >
+              <LogIn className="w-8 h-8 mb-3" />
+              <h3 className="font-semibold text-lg">Check In</h3>
+              <p className="text-sm text-emerald-100 mt-1">
+                {isCheckedOut ? 'Already checked out today' : 'Mark attendance now'}
+              </p>
+            </button>
+          ) : (
+            <button
+              onClick={handleCheckOut}
+              disabled={loading || isCheckedOut}
+              className="bg-gradient-to-br from-orange-500 to-red-600 text-white p-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
+            >
+              <LogOutIcon className="w-8 h-8 mb-3" />
+              <h3 className="font-semibold text-lg">Check Out</h3>
+              <p className="text-sm text-orange-100 mt-1">
+                {isCheckedOut ? 'Already checked out today' : 'End your workday'}
+              </p>
+            </button>
+          )}
 
           <button
             onClick={() => setShowLeaveModal(true)}
@@ -354,7 +417,7 @@ const LeaveApplicationModal = ({ onClose, onSuccess }) => {
 
     try {
       setSubmitting(true);
-      await api.post('/leaves', formData);
+      await api.post('/leaves/apply', formData);
       onSuccess();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to submit leave request');

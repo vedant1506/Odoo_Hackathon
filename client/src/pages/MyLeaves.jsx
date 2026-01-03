@@ -280,7 +280,7 @@ const LeaveModal = ({ onClose, onSuccess }) => {
 
     try {
       setSubmitting(true);
-      await api.post('/leaves', formData);
+      await api.post('/leaves/apply', formData);
       onSuccess();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to submit leave request');

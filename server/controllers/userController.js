@@ -1,6 +1,11 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 
+const toNumber = (value) => {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : 0;
+};
+
 const getEmployees = async (req, res) => {
   try {
     if (req.user.role === 'Admin' || req.user.role === 'HR') {
@@ -158,6 +163,44 @@ const adminUpdateEmployee = async (req, res) => {
   }
 };
 
+// HR/Admin: Update an employee's salary by employeeId
+const updateEmployeeSalaryByEmployeeId = async (req, res) => {
+  try {
+    const { employeeId } = req.params;
+    const { salary } = req.body;
+
+    if (!salary || typeof salary !== 'object') {
+      return res.status(400).json({ message: 'Salary payload is required' });
+    }
+
+    const employee = await User.findOne({ employeeId });
+    if (!employee) {
+      return res.status(404).json({ message: 'Employee not found' });
+    }
+
+    const basic = toNumber(salary.basic);
+    const hra = toNumber(salary.hra);
+    const allowances = toNumber(salary.allowances);
+    const deductions = toNumber(salary.deductions);
+    const total = salary.total !== undefined ? toNumber(salary.total) : basic + hra + allowances - deductions;
+
+    employee.salary = {
+      basic,
+      hra,
+      allowances,
+      deductions,
+      total,
+    };
+
+    await employee.save();
+    const updatedEmployee = await User.findOne({ employeeId }).select('-password');
+    return res.json(updatedEmployee);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
 // Delete user (Admin only)
 const deleteUser = async (req, res) => {
   try {
@@ -278,6 +321,7 @@ module.exports = {
   getProfile,
   updateProfile,
   adminUpdateEmployee,
+  updateEmployeeSalaryByEmployeeId,
   changePassword,
   deleteUser,
   uploadProfilePicture,
