@@ -184,30 +184,38 @@ const LeaveApplication = () => {
   return (
     <div className="space-y-6">
       {/* Leave Application Form */}
-      <div className="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl shadow-lg p-8 text-white">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
-            <FileText className="w-6 h-6 text-white" />
+      <div className="bg-gradient-to-br from-purple-600 via-purple-500 to-indigo-600 rounded-2xl shadow-2xl p-8 text-white relative overflow-hidden">
+        {/* Decorative Background Elements */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -translate-y-32 translate-x-32"></div>
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white opacity-5 rounded-full translate-y-24 -translate-x-24"></div>
+        
+        <div className="relative z-10">
+          <div className="flex items-center gap-4 mb-8">
+            <div className="w-14 h-14 bg-white bg-opacity-20 rounded-xl flex items-center justify-center backdrop-blur-sm shadow-lg">
+              <FileText className="w-7 h-7 text-white" />
+            </div>
+            <div>
+              <h2 className="text-3xl font-bold">Apply for Leave</h2>
+              <p className="text-purple-100 text-sm">Submit your leave request</p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-2xl font-bold">Apply for Leave</h2>
-            <p className="text-purple-100">Submit your leave request</p>
-          </div>
-        </div>
 
-        {/* Message Display */}
-        {message.text && (
-          <div className={`mb-6 p-4 rounded-lg ${
-            message.type === 'success' 
-              ? 'bg-green-500 bg-opacity-20 border border-green-300' 
-              : 'bg-red-500 bg-opacity-20 border border-red-300'
-          }`}>
-            <p className="text-sm font-medium">{message.text}</p>
-          </div>
-        )}
+          {/* Message Display */}
+          {message.text && (
+            <div className={`mb-6 p-4 rounded-xl backdrop-blur-sm ${
+              message.type === 'success' 
+                ? 'bg-green-500 bg-opacity-20 border border-green-300 border-opacity-50' 
+                : 'bg-red-500 bg-opacity-20 border border-red-300 border-opacity-50'
+            }`}>
+              <p className="text-sm font-medium flex items-center gap-2">
+                {message.type === 'success' ? <CheckCircle className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
+                {message.text}
+              </p>
+            </div>
+          )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Leave Type Dropdown */}
             <div>
               <label className="block text-sm font-medium text-white mb-2">
@@ -217,7 +225,7 @@ const LeaveApplication = () => {
                 name="leaveType"
                 value={formData.leaveType}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-white bg-opacity-20 border border-white border-opacity-30 rounded-lg text-white placeholder-purple-200 focus:ring-2 focus:ring-white focus:ring-opacity-50 focus:border-transparent transition-all backdrop-blur-sm"
+                className="w-full px-4 py-3.5 border border-gray-300 text-gray-900 rounded-xl bg-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all shadow-sm"
               >
                 <option value="Paid" className="text-gray-900">Paid Leave</option>
                 <option value="Sick" className="text-gray-900">Sick Leave</option>
@@ -230,11 +238,11 @@ const LeaveApplication = () => {
               <label className="block text-sm font-medium text-white mb-2">
                 Total Days
               </label>
-              <div className="w-full px-4 py-3 bg-white bg-opacity-20 border border-white border-opacity-30 rounded-lg">
-                <span className="text-2xl font-bold">
+              <div className="w-full px-4 py-3 bg-white bg-opacity-20 border border-white border-opacity-40 rounded-xl backdrop-blur-sm shadow-sm flex items-baseline gap-2">
+                <span className="text-3xl font-bold tracking-tight">
                   {calculateDays(formData.startDate, formData.endDate)}
                 </span>
-                <span className="text-sm text-purple-100 ml-2">
+                <span className="text-sm text-purple-100 font-medium">
                   {calculateDays(formData.startDate, formData.endDate) === 1 ? 'day' : 'days'}
                 </span>
               </div>
@@ -255,7 +263,7 @@ const LeaveApplication = () => {
                   value={formData.startDate}
                   onChange={handleChange}
                   min={new Date().toISOString().split('T')[0]}
-                  className="w-full pl-10 pr-4 py-3 bg-white bg-opacity-20 border border-white border-opacity-30 rounded-lg text-white placeholder-purple-200 focus:ring-2 focus:ring-white focus:ring-opacity-50 focus:border-transparent transition-all backdrop-blur-sm"
+                  className="w-full pl-10 pr-4 py-3.5 border border-gray-300 text-gray-900 rounded-xl bg-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all shadow-sm"
                 />
               </div>
             </div>
@@ -275,7 +283,7 @@ const LeaveApplication = () => {
                   value={formData.endDate}
                   onChange={handleChange}
                   min={formData.startDate || new Date().toISOString().split('T')[0]}
-                  className="w-full pl-10 pr-4 py-3 bg-white bg-opacity-20 border border-white border-opacity-30 rounded-lg text-white placeholder-purple-200 focus:ring-2 focus:ring-white focus:ring-opacity-50 focus:border-transparent transition-all backdrop-blur-sm"
+                  className="w-full pl-10 pr-4 py-3.5 border border-gray-300 text-gray-900 rounded-xl bg-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all shadow-sm"
                 />
               </div>
             </div>
@@ -296,7 +304,7 @@ const LeaveApplication = () => {
                 onChange={handleChange}
                 rows="4"
                 placeholder="Please provide a reason for your leave request..."
-                className="w-full pl-10 pr-4 py-3 bg-white bg-opacity-20 border border-white border-opacity-30 rounded-lg text-white placeholder-purple-200 focus:ring-2 focus:ring-white focus:ring-opacity-50 focus:border-transparent transition-all backdrop-blur-sm resize-none"
+                className="w-full pl-10 pr-4 py-3.5 border border-gray-300 text-gray-900 rounded-xl bg-white placeholder-gray-500 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all shadow-sm resize-none"
               />
             </div>
           </div>
@@ -305,7 +313,7 @@ const LeaveApplication = () => {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full bg-white text-purple-600 py-3 px-6 rounded-lg font-semibold hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-purple-600 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
+            className="w-full bg-white text-purple-600 py-4 px-6 rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl hover:bg-opacity-95 focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-50 transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3"
           >
             {submitting ? (
               <>
@@ -320,6 +328,7 @@ const LeaveApplication = () => {
             )}
           </button>
         </form>
+        </div>
       </div>
 
       {/* Leave Statistics */}
