@@ -169,13 +169,17 @@ const HRDashboard = () => {
     </div>
   );
 };
-
-const SummaryCard = ({ icon, title, value, accent }) => (
+const SummaryCard = ({ icon, title, value, accent, loading, meta }) => (
   <div className="bg-white rounded-xl shadow-md border border-slate-200 p-5 flex items-center gap-4">
-    <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${accent}`}> {icon} </div>
+    <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${accent}`}>{icon}</div>
     <div>
       <p className="text-sm text-slate-500">{title}</p>
-      <p className="text-2xl font-bold text-slate-900">{value}</p>
+      {loading ? (
+        <div className="h-7 w-16 bg-slate-200 rounded animate-pulse"></div>
+      ) : (
+        <p className="text-2xl font-bold text-slate-900">{value}</p>
+      )}
+      {meta && <p className="text-xs text-slate-500 mt-1">{meta}</p>}
     </div>
   </div>
 );
